@@ -100,23 +100,6 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     margin-bottom: 20px; 
 }
 
-.form-container {
-    width: 100%;
-    height: 600px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 15px;
-}
-
-/* Estilo para a lista de links externos */
-.external-links-list button {
-    margin-bottom: 8px;
-    text-align: left;
-    padding-left: 15px;
-    font-size: 14px;
-}
-
 @media (max-width: 600px) {
     body { padding: 5px; }
     .container { padding: 15px; border-radius: 0; margin: 0; }
@@ -261,45 +244,53 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 
 <div id="painelAdmin" class="container" style="display:none; border-top: 5px solid var(--primary)">
     <h2>⚙️ Gestão Administrativa</h2>
-    <div class="card">
-        <h4>Criar Novo Usuário</h4>
-        <input id="novoUsuario" placeholder="Username">
-        <input id="senhaUsuario" type="password" placeholder="Senha">
-        <select id="nivelUsuario">
-            <option value="user">Usuário Comum</option>
-            <option value="presidencia">Presidência</option>
-            <option value="admin">Administrador</option>
-        </select>
-        <select id="categoriaUsuario">
-            <option value="">-- Categoria (Se for comum) --</option>
-            <option value="Meio Ambiente">Meio Ambiente</option>
-            <option value="Linguagens">Linguagens</option>
-            <option value="Comunicações">Comunicações</option>
-            <option value="Edição de Vídeo">Edição de Vídeo</option>
-            <option value="Cultura">Cultura</option>
-            <option value="Secretaria">Secretaria</option>
-            <option value="Esportes">Esportes</option>
-            <option value="Presidência">Presidência</option>
-            <option value="Informações">Informações</option>
-            <option value="Designer">Designer</option>
-        </select>
-        <button id="btnAddUsuario">Adicionar Usuário</button>
-    </div>
+    
+    <div id="gavetaUsuarios" style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
+        <h3>👥 Gestão de Usuários e Acessos</h3>
+        
+        <div class="card">
+            <h4>🆕 Criar Novo Usuário</h4>
+            <div class="grid-form">
+                <input id="novoUsuario" placeholder="Username">
+                <input id="senhaUsuario" type="password" placeholder="Senha">
+                <select id="nivelUsuario">
+                    <option value="user">Usuário Comum</option>
+                    <option value="gestao">Gestão</option>
+                    <option value="presidencia">Presidência</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                <select id="categoriaUsuario">
+                    <option value="">-- Categoria (Se for comum) --</option>
+                    <option value="Meio Ambiente">Meio Ambiente</option>
+                    <option value="Linguagens">Linguagens</option>
+                    <option value="Comunicações">Comunicações</option>
+                    <option value="Edição de Vídeo">Edição de Vídeo</option>
+                    <option value="Cultura">Cultura</option>
+                    <option value="Secretaria">Secretaria</option>
+                    <option value="Esportes">Esportes</option>
+                    <option value="Presidência">Presidência</option>
+                    <option value="Informações">Informações</option>
+                    <option value="Designer">Designer</option>
+                </select>
+            </div>
+            <button id="btnAddUsuario">Adicionar Usuário ao Sistema</button>
+        </div>
 
-    <h4>👥 Usuários do Sistema</h4>
-    <div id="listaUsuarios"></div>
+        <h4>Lista de Usuários Cadastrados</h4>
+        <div id="listaUsuarios" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px;"></div>
+    </div>
 
     <hr>
     <h4>🕵️ Registro de Acessos (Log)</h4>
     <button class="secondary btn-mini" id="btnCarregarLogs">Atualizar Logs de Acesso</button>
     <button class="danger btn-mini" id="btnLimparLogs">Limpar Logs</button>
-    <div id="containerLogs" style="max-height: 300px; overflow-y: auto; margin-top: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+    <div id="containerLogs" style="max-height: 300px; overflow-y: auto; margin-top: 10px; background: #f1f5f9; padding: 10px; border-radius: 8px;">
         <p style="font-size: 12px; color: var(--gray);">Clique em atualizar para ver quem acessou o sistema.</p>
     </div>
 
     <hr>
     <h4>🗑️ Lixeira de Itens Excluídos</h4>
-    <button class="danger btn-mini" id="btnLimparLixeira">Esvaziar Lixeira</button>
+    <button class="danger btn-mini" id="btnLimparLixeira">Esvaziar Lixeira Permanentemente</button>
     <div id="listaLixeira" style="font-size: 11px; margin-top:10px;"></div>
 </div>
 
@@ -413,7 +404,7 @@ async function enviarSugestao() {
         categoriaAutor: usuarioLogado.categoria || "N/A",
         data: new Date().toLocaleString('pt-BR'),
         timestamp: Date.now(),
-        respostas: [] // Inicializa array de respostas da gestão
+        respostas: [] 
     };
 
     try {
@@ -437,8 +428,10 @@ async function carregarSugestoes() {
     if(lista.length === 0) el.containerMensagens.innerHTML = "<p>Nenhuma mensagem recebida ainda.</p>";
     
     lista.forEach(msg => {
-        // Regra: Admin/Presidência veem tudo. Usuário comum vê as suas próprias.
-        if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || msg.autor === usuarioLogado.usuario) {
+        // ADMIN, PRESIDENCIA e GESTAO veem TUDO. USER comum vê apenas o dele.
+        const temPermissaoGeral = (usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao');
+        
+        if(temPermissaoGeral || msg.autor === usuarioLogado.usuario) {
             
             let htmlRespostas = "";
             if(msg.respostas && msg.respostas.length > 0) {
@@ -451,9 +444,9 @@ async function carregarSugestoes() {
                 htmlRespostas += `</div>`;
             }
 
-            // Campo de resposta apenas para Admin e Presidência
             let campoResposta = "";
-            if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia') {
+            // Agora GESTÃO também pode responder
+            if(temPermissaoGeral) {
                 campoResposta = `
                     <div style="margin-top:10px; display:flex; gap:5px;">
                         <input id="resp_${msg.id}" placeholder="Escreva uma resposta..." style="margin-bottom:0; font-size:13px; height:35px;">
@@ -484,7 +477,6 @@ window.responderSugestao = async (id) => {
     if(!texto) return;
 
     try {
-        // Buscar o documento atual para atualizar o array de respostas
         const s = await getDocs(collection(db, 'sugestoes'));
         const docRef = doc(db, 'sugestoes', id);
         const msg = s.docs.find(d => d.id === id).data();
@@ -552,7 +544,8 @@ function entrarNoSistema(u) {
     } else {
         el.secaoCadastro.style.display = 'none';
         
-        if(u.nivel === 'presidencia') {
+        // GESTAO agora tem visão ampla igual PRESIDENCIA
+        if(u.nivel === 'presidencia' || u.nivel === 'gestao') {
             if(el.buscaCategoria) { 
                 el.buscaCategoria.disabled = false; 
                 el.buscaCategoria.value = ""; 
@@ -608,11 +601,14 @@ window.excluirUsuario = async (id) => {
 
 async function carregarPessoas(){
     const s = await getDocs(collection(db, 'pessoas'));
-    pessoas = s.docs.map(d => ({id: d.id, ...d.data()}));
+    const listaGeralPessoas = s.docs.map(d => ({id: d.id, ...d.data()}));
+    pessoas = listaGeralPessoas;
+
     if(el.pessoaNota){
         el.pessoaNota.innerHTML = '<option value="">Selecione um colaborador...</option>';
         pessoas.forEach((p, i) => {
-            if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || p.categoria === usuarioLogado.categoria)
+            // GESTAO pode registrar nota para qualquer um
+            if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao' || p.categoria === usuarioLogado.categoria)
                 el.pessoaNota.add(new Option(p.nome, i));
         });
     }
@@ -661,7 +657,7 @@ async function salvarNota(){
     
     await updateDoc(doc(db, 'pessoas', p.id), { notas: p.notas });
     el.nota.value = ""; 
-    alert("Nota registada!"); 
+    alert("Nota registrada!"); 
     atualizarGrafico();
     if(el.secaoNotas.style.display === 'block') window.verNotas(pIdx);
 }
@@ -729,7 +725,8 @@ window.buscar = function(){
     const filt = pessoas.filter(p => {
         const nMatch = p.nome.toLowerCase().includes(buscaN);
         const cMatch = buscaC === "" || p.categoria === buscaC;
-        if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia') return nMatch && cMatch;
+        // GESTAO incluída na permissão de ver tudo
+        if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao') return nMatch && cMatch;
         return p.categoria === usuarioLogado.categoria && nMatch;
     });
     
@@ -809,8 +806,10 @@ async function addUsuario(){
 
 function atualizarGrafico(){
     let e=0, r=0, m=0;
+    const ctx = el.grafico.getContext('2d');
     pessoas.forEach(p => {
-        if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || p.categoria === usuarioLogado.categoria) {
+        // GESTAO pode ver gráfico geral
+        if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao' || (usuarioLogado.categoria && p.categoria === usuarioLogado.categoria)) {
             p.notas?.forEach(n => { 
                 if(n.tipo==='elogio') e++; 
                 else if(n.tipo==='reclamacao') r++; 
@@ -820,7 +819,6 @@ function atualizarGrafico(){
     });
     
     if(chart) chart.destroy();
-    const ctx = el.grafico.getContext('2d');
     chart = new Chart(ctx, { 
         type: 'pie', 
         data: { 
