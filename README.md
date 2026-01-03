@@ -40,12 +40,13 @@ button.success { background: var(--success); }
 .card { border:1px solid #eee; padding:15px; border-radius:8px; margin:10px 0; background:#fff; position: relative; word-wrap: break-word; }
 .bloqueado { background: #fee2e2 !important; border: 1px solid #ef4444; }
 
-.elogio, .reclamacao, .melhorar, .excluida, .feedback-item { padding:12px; margin:10px 0; position: relative; border-radius: 4px; border-left-width: 5px; border-left-style: solid; }
+.elogio, .reclamacao, .melhorar, .excluida, .feedback-item, .log-item { padding:12px; margin:10px 0; position: relative; border-radius: 4px; border-left-width: 5px; border-left-style: solid; }
 .elogio { background:#f0fdf4; border-left-color: var(--success); }
 .reclamacao { background:#fef2f2; border-left-color: var(--danger); }
 .melhorar { background:#fffbeb; border-left-color: var(--warning); }
 .excluida { border-left-color: var(--gray); background:#f1f5f9; opacity: 0.7; font-style: italic; }
 .feedback-item { background: #f8fafc; border-left-color: var(--indigo); }
+.log-item { background: #f1f5f9; border-left-color: var(--gray); font-size: 13px; }
 
 .btn-del-nota { position: absolute; top: 10px; right: 10px; color: var(--danger); cursor: pointer; font-size: 20px; }
 .btn-restore-nota { position: absolute; top: 10px; right: 40px; color: var(--success); cursor: pointer; font-size: 20px; }
@@ -65,6 +66,7 @@ button.success { background: var(--success); }
     border-radius: 50%; 
     width: 60px;
     height: 60px;
+    display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
@@ -90,7 +92,6 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     margin-bottom: 20px; 
 }
 
-/* Novo Estilo para Iframe de Formulário */
 .form-container {
     width: 100%;
     height: 600px;
@@ -98,6 +99,14 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     border-radius: 12px;
     overflow: hidden;
     margin-top: 15px;
+}
+
+/* Estilo para a lista de links externos */
+.external-links-list button {
+    margin-bottom: 8px;
+    text-align: left;
+    padding-left: 15px;
+    font-size: 14px;
 }
 
 @media (max-width: 600px) {
@@ -130,14 +139,12 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     <div class="actions-header">
         <button id="btnExcel" style="background:var(--success)">📊 Exportar Excel (Por Categorias)</button>
         <button onclick="window.location.href='https://clx-trem20.github.io/gerenciado-informa/'" style="background: #6366f1;">🌐 Gerenciador Externo</button>
-        <!-- Novo Botão de Formulário -->
         <button id="btnToggleForm" style="background: var(--indigo)">📋 Central de Formulários</button>
     </div>
 
-    <!-- NOVA SEÇÃO: CENTRAL DE FORMULÁRIOS -->
     <div id="secaoFormularios" style="display:none; background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
         <h3>📋 Central de Formulários e Pesquisas</h3>
-        <p style="color:var(--gray); font-size:14px;">Envie sugestões ou acesse formulários externos diretamente por aqui.</p>
+        <p style="color:var(--gray); font-size:14px;">Envie sugestões internas ou acesse os formulários oficiais abaixo.</p>
         
         <div class="grid-form">
             <div class="card">
@@ -145,14 +152,17 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
                 <input id="formAssunto" placeholder="Assunto (ex: Infraestrutura, Eventos)">
                 <textarea id="formMensagem" style="height:80px;" placeholder="Sua mensagem para a gestão..."></textarea>
                 <button id="btnEnviarSugestao" class="success">Enviar para Gestores</button>
+                <button id="btnVerRespostasSugestoes" class="secondary btn-mini" style="margin-top:10px">Ver Mensagens Enviadas</button>
             </div>
             
             <div class="card">
-                <h4>🔗 Link Externo Rápido</h4>
-                <p style="font-size:13px;">Acesse o formulário oficial de avaliação:</p>
-                <!-- Altere o href abaixo para o seu link real do Google Forms -->
-                <button onclick="window.open('https://forms.google.com', '_blank')" style="background:var(--primary)">Abrir Google Forms</button>
-                <button id="btnVerRespostasSugestoes" class="secondary btn-mini" style="margin-top:10px">Ver Mensagens Recebidas</button>
+                <h4>🔗 Links Externos de Avaliação</h4>
+                <div class="external-links-list">
+                    <button onclick="window.open('https://forms.gle/EqHJSSPBqnHiJ5YbA', '_blank')" style="background:var(--primary)">⭐ Avaliação Equipe Gestora</button>
+                    <button onclick="window.open('https://forms.gle/MSRYyYtL5QQmdjXV6', '_blank')" style="background:var(--primary)">📰 Avaliação do Jornal</button>
+                    <button onclick="window.open('https://forms.gle/Lt5ekRsa1cweDDTV6', '_blank')" style="background:var(--primary)">📂 Avaliação Direção de Categoria</button>
+                    <button onclick="window.open('https://forms.gle/XASGVVkvvH52kzRq5', '_blank')" style="background:var(--danger)">⚠️ Formulário de Denúncias</button>
+                </div>
             </div>
         </div>
 
@@ -272,6 +282,14 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     <div id="listaUsuarios"></div>
 
     <hr>
+    <h4>🕵️ Registro de Acessos (Log)</h4>
+    <button class="secondary btn-mini" id="btnCarregarLogs">Atualizar Logs de Acesso</button>
+    <button class="danger btn-mini" id="btnLimparLogs">Limpar Logs</button>
+    <div id="containerLogs" style="max-height: 300px; overflow-y: auto; margin-top: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+        <p style="font-size: 12px; color: var(--gray);">Clique em atualizar para ver quem acessou o sistema.</p>
+    </div>
+
+    <hr>
     <h4>🗑️ Lixeira de Itens Excluídos</h4>
     <button class="danger btn-mini" id="btnLimparLixeira">Esvaziar Lixeira</button>
     <div id="listaLixeira" style="font-size: 11px; margin-top:10px;"></div>
@@ -281,7 +299,7 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCtJytArZciWTcAaVI--bY7mSiFVE-K6Zw",
@@ -300,8 +318,8 @@ let el = {};
 
 window.addEventListener('DOMContentLoaded', async () => {
     const IDs = ['login','sistema','adminGear','painelAdmin','erro','loginUsuario','loginSenha','btnLogin','btnLogout','btnSalvarPessoa','btnSalvarNota','btnBuscar','btnAddUsuario','listaUsuarios','nome','categoria','anoEntrada','matricula','email','telefone','contato','cpf','rg','dataNascimento','pessoaNota','tipoNota','nota','buscaNome','buscaCategoria','resultado','grafico','listaNotas','secaoNotas','novoUsuario','senhaUsuario','nivelUsuario','categoriaUsuario','listaLixeira','btnLimparLixeira','btnExcel','gavetaExcluidas','listaExcluidas','secaoCadastro',
-    /* Novos IDs */
-    'btnToggleForm','secaoFormularios','btnEnviarSugestao','formAssunto','formMensagem','btnVerRespostasSugestoes','listaSugestoesGestao','containerMensagens'];
+    'btnToggleForm','secaoFormularios','btnEnviarSugestao','formAssunto','formMensagem','btnVerRespostasSugestoes','listaSugestoesGestao','containerMensagens',
+    'btnCarregarLogs', 'btnLimparLogs', 'containerLogs'];
     
     IDs.forEach(id => el[id] = document.getElementById(id));
 
@@ -313,8 +331,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     if(el.btnAddUsuario) el.btnAddUsuario.onclick = addUsuario;
     if(el.btnLimparLixeira) el.btnLimparLixeira.onclick = limparLixeira;
     if(el.btnExcel) el.btnExcel.onclick = exportarExcel;
+    if(el.btnCarregarLogs) el.btnCarregarLogs.onclick = carregarLogs;
+    if(el.btnLimparLogs) el.btnLimparLogs.onclick = limparLogs;
 
-    /* Lógica dos Novos Botões */
     if(el.btnToggleForm) el.btnToggleForm.onclick = () => {
         el.secaoFormularios.style.display = el.secaoFormularios.style.display === 'none' ? 'block' : 'none';
     };
@@ -324,7 +343,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     if(el.adminGear) {
         el.adminGear.onclick = () => {
             el.painelAdmin.style.display = el.painelAdmin.style.display==='none' || el.painelAdmin.style.display==='' ? 'block' : 'none';
-            if(el.painelAdmin.style.display === 'block') el.painelAdmin.scrollIntoView({behavior: 'smooth'});
+            if(el.painelAdmin.style.display === 'block') {
+                el.painelAdmin.scrollIntoView({behavior: 'smooth'});
+                carregarLogs();
+            }
         };
     }
 
@@ -337,7 +359,42 @@ window.addEventListener('DOMContentLoaded', async () => {
     await carregarUsuarios();
 });
 
-/* FUNÇÃO PARA ENVIAR FORMULÁRIO INTERNO */
+async function registrarAcesso(usuario) {
+    try {
+        await addDoc(collection(db, 'acessos'), {
+            usuario: usuario.usuario,
+            nivel: usuario.nivel,
+            data: new Date().toLocaleString('pt-BR'),
+            timestamp: Date.now()
+        });
+    } catch(e) { console.error("Erro ao registrar log"); }
+}
+
+async function carregarLogs() {
+    if(usuarioLogado.nivel !== 'admin') return;
+    el.containerLogs.innerHTML = "Carregando históricos...";
+    const s = await getDocs(collection(db, 'acessos'));
+    const logs = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => b.timestamp - a.timestamp);
+    
+    el.containerLogs.innerHTML = "";
+    if(logs.length === 0) el.containerLogs.innerHTML = "Nenhum acesso registrado.";
+    
+    logs.slice(0, 50).forEach(l => {
+        el.containerLogs.innerHTML += `
+            <div class="log-item">
+                👤 <b>${l.usuario}</b> (${l.nivel}) acessou em 📅 ${l.data}
+            </div>
+        `;
+    });
+}
+
+async function limparLogs() {
+    if(!confirm("Deseja apagar todo o histórico de acessos?")) return;
+    const s = await getDocs(collection(db, 'acessos'));
+    for (const d of s.docs) { await deleteDoc(doc(db, 'acessos', d.id)); }
+    carregarLogs();
+}
+
 async function enviarSugestao() {
     if(!el.formAssunto.value || !el.formMensagem.value) return alert("Por favor, preencha o assunto e a mensagem.");
     
@@ -360,7 +417,6 @@ async function enviarSugestao() {
     }
 }
 
-/* FUNÇÃO PARA GESTORES VEREM AS RESPOSTAS */
 async function carregarSugestoes() {
     el.listaSugestoesGestao.style.display = 'block';
     el.containerMensagens.innerHTML = "Carregando mensagens...";
@@ -372,7 +428,6 @@ async function carregarSugestoes() {
     if(lista.length === 0) el.containerMensagens.innerHTML = "<p>Nenhuma mensagem recebida ainda.</p>";
     
     lista.forEach(msg => {
-        // Regra de visualização: Admin/Presidência vê tudo, User vê só o que ele mesmo mandou (ou você pode ajustar para User não ver nada)
         if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || msg.autor === usuarioLogado.usuario) {
             el.containerMensagens.innerHTML += `
                 <div class="feedback-item">
@@ -412,6 +467,7 @@ async function login(){
         }
         
         localStorage.setItem('sessao_informa', JSON.stringify(u));
+        await registrarAcesso(u);
         entrarNoSistema(u);
     } catch (err) {
         el.erro.innerText = "Erro ao conectar com o banco de dados.";
