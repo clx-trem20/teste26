@@ -48,6 +48,14 @@ button.success { background: var(--success); }
 .feedback-item { background: #f8fafc; border-left-color: var(--indigo); }
 .log-item { background: #f1f5f9; border-left-color: var(--gray); font-size: 13px; }
 
+.respostas-gestao {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
 .btn-del-nota { position: absolute; top: 10px; right: 10px; color: var(--danger); cursor: pointer; font-size: 20px; }
 .btn-restore-nota { position: absolute; top: 10px; right: 40px; color: var(--success); cursor: pointer; font-size: 20px; }
 
@@ -152,7 +160,7 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
                 <input id="formAssunto" placeholder="Assunto (ex: Infraestrutura, Eventos)">
                 <textarea id="formMensagem" style="height:80px;" placeholder="Sua mensagem para a gestão..."></textarea>
                 <button id="btnEnviarSugestao" class="success">Enviar para Gestores</button>
-                <button id="btnVerRespostasSugestoes" class="secondary btn-mini" style="margin-top:10px">Ver Mensagens Enviadas</button>
+                <button id="btnVerRespostasSugestoes" class="secondary btn-mini" style="margin-top:10px">Ver Mensagens e Respostas</button>
             </div>
             
             <div class="card">
@@ -166,8 +174,8 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
             </div>
         </div>
 
-        <div id="listaSugestoesGestao" style="display:none; margin-top:20px; max-height: 300px; overflow-y: auto;">
-            <h4>📥 Mensagens Recebidas</h4>
+        <div id="listaSugestoesGestao" style="display:none; margin-top:20px; max-height: 500px; overflow-y: auto;">
+            <h4>📥 Histórico de Sugestões e Respostas</h4>
             <div id="containerMensagens"></div>
         </div>
     </div>
@@ -404,7 +412,8 @@ async function enviarSugestao() {
         autor: usuarioLogado.usuario,
         categoriaAutor: usuarioLogado.categoria || "N/A",
         data: new Date().toLocaleString('pt-BR'),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        respostas: [] // Inicializa array de respostas da gestão
     };
 
     try {
@@ -428,17 +437,72 @@ async function carregarSugestoes() {
     if(lista.length === 0) el.containerMensagens.innerHTML = "<p>Nenhuma mensagem recebida ainda.</p>";
     
     lista.forEach(msg => {
+        // Regra: Admin/Presidência veem tudo. Usuário comum vê as suas próprias.
         if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || msg.autor === usuarioLogado.usuario) {
+            
+            let htmlRespostas = "";
+            if(msg.respostas && msg.respostas.length > 0) {
+                htmlRespostas = `<div class="respostas-gestao"><strong>📢 Respostas da Gestão:</strong><br>`;
+                msg.respostas.forEach(r => {
+                    htmlRespostas += `<div style="margin-top:5px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                        <i>"${r.texto}"</i> — <b>${r.autor}</b> <small>(${r.data})</small>
+                    </div>`;
+                });
+                htmlRespostas += `</div>`;
+            }
+
+            // Campo de resposta apenas para Admin e Presidência
+            let campoResposta = "";
+            if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia') {
+                campoResposta = `
+                    <div style="margin-top:10px; display:flex; gap:5px;">
+                        <input id="resp_${msg.id}" placeholder="Escreva uma resposta..." style="margin-bottom:0; font-size:13px; height:35px;">
+                        <button class="success btn-mini" onclick="window.responderSugestao('${msg.id}')" style="margin:0;">Responder</button>
+                    </div>
+                `;
+            }
+
             el.containerMensagens.innerHTML += `
                 <div class="feedback-item">
-                    <strong>Assunto: ${msg.assunto}</strong><br>
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong>Assunto: ${msg.assunto}</strong>
+                        ${usuarioLogado.nivel === 'admin' ? `<button class="danger btn-mini" onclick="window.excluirSugestao('${msg.id}')" style="padding:2px 8px;">×</button>` : ''}
+                    </div>
                     <p style="margin:5px 0;">${msg.mensagem}</p>
                     <small>Enviado por: ${msg.autor} (${msg.categoriaAutor}) em ${msg.data}</small>
-                    ${usuarioLogado.nivel === 'admin' ? `<br><button class="danger btn-mini" onclick="window.excluirSugestao('${msg.id}')">Apagar</button>` : ''}
+                    ${htmlRespostas}
+                    ${campoResposta}
                 </div>
             `;
         }
     });
+}
+
+window.responderSugestao = async (id) => {
+    const input = document.getElementById(`resp_${id}`);
+    const texto = input.value;
+    if(!texto) return;
+
+    try {
+        // Buscar o documento atual para atualizar o array de respostas
+        const s = await getDocs(collection(db, 'sugestoes'));
+        const docRef = doc(db, 'sugestoes', id);
+        const msg = s.docs.find(d => d.id === id).data();
+        
+        const novasRespostas = msg.respostas || [];
+        novasRespostas.push({
+            texto: texto,
+            autor: usuarioLogado.usuario,
+            data: new Date().toLocaleString('pt-BR'),
+            timestamp: Date.now()
+        });
+
+        await updateDoc(docRef, { respostas: novasRespostas });
+        alert("Resposta enviada!");
+        carregarSugestoes();
+    } catch (e) {
+        alert("Erro ao salvar resposta.");
+    }
 }
 
 window.excluirSugestao = async (id) => {
