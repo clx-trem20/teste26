@@ -7,18 +7,33 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root { --primary: #2563eb; --danger: #dc2626; --success: #10b981; --warning: #eab308; --gray: #64748b; --indigo: #6366f1; }
-body{ font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height:100vh; display:flex; flex-direction:column; margin:0; padding: 10px; box-sizing: border-box; }
+
+/* Alterado para carregar o ficheiro local fundo.jpg */
+body { 
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-image: linear-gradient(rgba(240, 242, 245, 0.6), rgba(240, 242, 245, 0.6)), url('fundo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height:100vh; 
+    display:flex; 
+    flex-direction:column; 
+    margin:0; 
+    padding: 10px; 
+    box-sizing: border-box; 
+}
 
 .container{ 
     width: 100%;
     max-width: 1400px; 
     margin: 10px auto; 
-    background:#fff; 
+    background: rgba(255, 255, 255, 0.85); 
     padding: 20px; 
     border-radius:12px; 
     flex:1; 
-    box-shadow:0 10px 25px rgba(0,0,0,0.05); 
+    box-shadow:0 10px 25px rgba(0,0,0,0.15); 
     box-sizing: border-box;
+    backdrop-filter: blur(10px); 
 }
 
 input, select, textarea, button { 
@@ -37,7 +52,7 @@ button.danger { background: var(--danger); }
 button.secondary { background: var(--gray); }
 button.success { background: var(--success); }
 
-.card { border:1px solid #eee; padding:15px; border-radius:8px; margin:10px 0; background:#fff; position: relative; word-wrap: break-word; }
+.card { border:1px solid #eee; padding:15px; border-radius:8px; margin:10px 0; background: rgba(255, 255, 255, 0.95); position: relative; word-wrap: break-word; }
 .bloqueado { background: #fee2e2 !important; border: 1px solid #ef4444; }
 
 .elogio, .reclamacao, .melhorar, .excluida, .feedback-item, .log-item { padding:12px; margin:10px 0; position: relative; border-radius: 4px; border-left-width: 5px; border-left-style: solid; }
@@ -59,7 +74,7 @@ button.success { background: var(--success); }
 .btn-del-nota { position: absolute; top: 10px; right: 10px; color: var(--danger); cursor: pointer; font-size: 20px; }
 .btn-restore-nota { position: absolute; top: 10px; right: 40px; color: var(--success); cursor: pointer; font-size: 20px; }
 
-#login { width: 100%; max-width:400px; margin:auto; background:#fff; padding:30px; border-radius:12px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.1); box-sizing: border-box; }
+#login { width: 100%; max-width:400px; margin:auto; background: rgba(255, 255, 255, 0.85); padding:30px; border-radius:12px; text-align:center; box-shadow:0 15px 35px rgba(0,0,0,0.2); box-sizing: border-box; backdrop-filter: blur(10px); }
 
 #adminGear { 
     position:fixed; 
@@ -81,7 +96,7 @@ button.success { background: var(--success); }
     border: 2px solid white;
 }
 
-footer { text-align:center; padding:20px; color:#666; font-size:13px; }
+footer { text-align:center; padding:20px; color:#111; font-size:13px; font-weight: bold; text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
 
 .grid-form { 
     display: grid; 
@@ -90,7 +105,7 @@ footer { text-align:center; padding:20px; color:#666; font-size:13px; }
     margin-bottom: 10px;
 }
 
-hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
+hr { border: 0; border-top: 1px solid #ddd; margin: 30px 0; }
 .btn-mini { width: auto; padding: 8px 15px; font-size: 13px; margin: 4px 2px; }
 
 .actions-header { 
@@ -133,7 +148,7 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
         <button id="btnToggleForm" style="background: var(--indigo)">📋 Central de Formulários</button>
     </div>
 
-    <div id="secaoFormularios" style="display:none; background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
+    <div id="secaoFormularios" style="display:none; background:rgba(248, 250, 252, 0.9); padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
         <h3>📋 Central de Formulários e Pesquisas</h3>
         <p style="color:var(--gray); font-size:14px;">Envie sugestões internas ou acesse os formulários oficiais abaixo.</p>
         
@@ -227,7 +242,7 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     <button id="btnBuscar">Consultar</button>
     <div id="resultado"></div>
 
-    <div id="secaoNotas" style="display:none; margin-top:20px; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+    <div id="secaoNotas" style="display:none; margin-top:20px; background: rgba(255, 255, 255, 0.95); padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
         <h3 id="tituloNotas">Histórico</h3>
         <div id="listaNotas"></div>
         <div id="gavetaExcluidas" style="margin-top:20px; border-top: 1px dashed #ccc; padding-top:10px; display:none;">
@@ -245,7 +260,7 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
 <div id="painelAdmin" class="container" style="display:none; border-top: 5px solid var(--primary)">
     <h2>⚙️ Gestão Administrativa</h2>
     
-    <div id="gavetaUsuarios" style="background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
+    <div id="gavetaUsuarios" style="background:rgba(248, 250, 252, 0.9); padding:20px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px;">
         <h3>👥 Gestão de Usuários e Acessos</h3>
         
         <div class="card">
@@ -284,7 +299,7 @@ hr { border: 0; border-top: 1px solid #eee; margin: 30px 0; }
     <h4>🕵️ Registro de Acessos (Log)</h4>
     <button class="secondary btn-mini" id="btnCarregarLogs">Atualizar Logs de Acesso</button>
     <button class="danger btn-mini" id="btnLimparLogs">Limpar Logs</button>
-    <div id="containerLogs" style="max-height: 300px; overflow-y: auto; margin-top: 10px; background: #f1f5f9; padding: 10px; border-radius: 8px;">
+    <div id="containerLogs" style="max-height: 300px; overflow-y: auto; margin-top: 10px; background: rgba(241, 245, 249, 0.9); padding: 10px; border-radius: 8px;">
         <p style="font-size: 12px; color: var(--gray);">Clique em atualizar para ver quem acessou o sistema.</p>
     </div>
 
@@ -428,7 +443,6 @@ async function carregarSugestoes() {
     if(lista.length === 0) el.containerMensagens.innerHTML = "<p>Nenhuma mensagem recebida ainda.</p>";
     
     lista.forEach(msg => {
-        // ADMIN, PRESIDENCIA e GESTAO veem TUDO. USER comum vê apenas o dele.
         const temPermissaoGeral = (usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao');
         
         if(temPermissaoGeral || msg.autor === usuarioLogado.usuario) {
@@ -445,7 +459,6 @@ async function carregarSugestoes() {
             }
 
             let campoResposta = "";
-            // Agora GESTÃO também pode responder
             if(temPermissaoGeral) {
                 campoResposta = `
                     <div style="margin-top:10px; display:flex; gap:5px;">
@@ -544,7 +557,6 @@ function entrarNoSistema(u) {
     } else {
         el.secaoCadastro.style.display = 'none';
         
-        // GESTAO agora tem visão ampla igual PRESIDENCIA
         if(u.nivel === 'presidencia' || u.nivel === 'gestao') {
             if(el.buscaCategoria) { 
                 el.buscaCategoria.disabled = false; 
@@ -607,7 +619,6 @@ async function carregarPessoas(){
     if(el.pessoaNota){
         el.pessoaNota.innerHTML = '<option value="">Selecione um colaborador...</option>';
         pessoas.forEach((p, i) => {
-            // GESTAO pode registrar nota para qualquer um
             if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao' || p.categoria === usuarioLogado.categoria)
                 el.pessoaNota.add(new Option(p.nome, i));
         });
@@ -725,7 +736,6 @@ window.buscar = function(){
     const filt = pessoas.filter(p => {
         const nMatch = p.nome.toLowerCase().includes(buscaN);
         const cMatch = buscaC === "" || p.categoria === buscaC;
-        // GESTAO incluída na permissão de ver tudo
         if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao') return nMatch && cMatch;
         return p.categoria === usuarioLogado.categoria && nMatch;
     });
@@ -808,7 +818,6 @@ function atualizarGrafico(){
     let e=0, r=0, m=0;
     const ctx = el.grafico.getContext('2d');
     pessoas.forEach(p => {
-        // GESTAO pode ver gráfico geral
         if(usuarioLogado.nivel === 'admin' || usuarioLogado.nivel === 'presidencia' || usuarioLogado.nivel === 'gestao' || (usuarioLogado.categoria && p.categoria === usuarioLogado.categoria)) {
             p.notas?.forEach(n => { 
                 if(n.tipo==='elogio') e++; 
